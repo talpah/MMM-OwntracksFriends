@@ -8,8 +8,15 @@
 var NodeHelper = require("node_helper");
 var mqtt = require('mqtt');
 var moment = require('moment');
+var http = require('http');
 
 module.exports = NodeHelper.create({
+
+
+    start: function () {
+        console.log("Starting module: " + this.name);
+        this.mqttconnection = null;
+    },
 
     // Override socketNotificationReceived method.
 
@@ -21,7 +28,6 @@ module.exports = NodeHelper.create({
      */
     socketNotificationReceived: function (notification, payload) {
         if (notification === "OwntracksFriends-SETUP-MQTT") {
-            console.log("OwntracksFriend - initializing mosquitto connection");
             this.doMqtt(payload.mqtt);
             this.config = payload;
         }
@@ -30,40 +36,52 @@ module.exports = NodeHelper.create({
     doMqtt: function (settings) {
         var self = this;
 
-        var client = mqtt.connect(settings.host, {
+        if (this.mqttconnection !== null) {
+            console.log(self.name + ' - Reusing mqtt client');
+            this.mqttconnection.unsubscribe('owntracks/#');
+            this.mqttconnection.subscribe('owntracks/#');
+            return;
+        }
+        this.mqttconnection = mqtt.connect(settings.host, {
             username: settings.username,
             password: settings.password
         });
 
-        client.on("connect", function () {
-            console.log("OwntracksFriends connected to mqtt");
-            client.subscribe("owntracks/#");
+        this.mqttconnection.on("connect", function () {
+            console.log(self.name + " connected to mqtt");
+            self.mqttconnection.subscribe("owntracks/#");
             // client.publish('presence', 'Hello mqtt')
         });
-        client.on("error", function (error) {
-            console.log("Owntracks could not connect to mqtt:");
-            console.log(error);
+        this.mqttconnection.on("error", function (error) {
+            console.log(self.name + " could not connect to mqtt:" + error);
         });
 
-        client.on("message", function (topic, message) {
+        this.mqttconnection.on("message", function (topic, message) {
             // message is Buffer
-            self.sendUpdate(topic, message)
+            self.prepareUpdate(topic, message.toString(), self.sendUpdateNotification)
             // client.end()
         });
     },
 
-    sendUpdate: function (topic, message) {
-        var parsedMessage = message.toString();
-        if (parsedMessage.length) {
-            var otMessage = JSON.parse(parsedMessage);
-            this.sendSocketNotification("OwntracksFriends-LOCATION-UPDATE", this.updateUserLocation(topic, otMessage));
+    sendUpdateNotification: function (self, topic, payload) {
+        if (payload) {
+            self.sendSocketNotification("OwntracksFriends-LOCATION-UPDATE", payload);
         } else {
-            this.sendSocketNotification("OwntracksFriends-GENERAL-UPDATE", {topic: topic});
+            self.sendSocketNotification("OwntracksFriends-GENERAL-UPDATE", {topic: topic});
         }
 
     },
 
-    updateUserLocation: function (topic, message) {
+    prepareUpdate: function (topic, payload, callback) {
+        var self = this;
+        // Try to parse the String into JSON
+        if (payload.length) {
+            payload = JSON.parse(payload);
+        } else {
+            callback(self, topic, payload);
+            return;
+        }
+
         var user = topic.split("/")[1];
         var device = topic.split("/")[2];
         var gravatar_photo = null;
@@ -74,11 +92,45 @@ module.exports = NodeHelper.create({
             gravatar_photo = "//www.gravatar.com/avatar/" + email_hash;
         }
 
-        return {
+        var prepared_payload = {
+            topic: topic,
             user: user,
             user_photo: gravatar_photo,
             device: device,
-            data: message
+            data: payload
         };
+
+        // No coordinates, call the callback now.
+        if (!payload.hasOwnProperty('lat') || !payload.hasOwnProperty('lon')) {
+            callback(self, topic, prepared_payload);
+            return;
+        }
+
+        http.get({
+            host: 'nominatim.openstreetmap.org',
+            headers: {'user-agent': 'MagicMirror OwntracksFriends'},
+            path: '/reverse?format=json&zoom=18' + "&lat=" + payload.lat + "&lon=" + payload.lon
+        }, function (res) {
+            var body = ''; // Will contain the final response
+            // Received data is a buffer.
+            // Adding it to our body
+            res.on('data', function (data) {
+                body += data;
+            });
+            // After the response is completed, parse it and log it to the console
+            res.on('end', function () {
+                try {
+                    var parsed = JSON.parse(body);
+                    prepared_payload.reverse_geo = parsed.display_name;
+                    callback(self, topic, prepared_payload);
+                } catch (e) {
+                    Log.error("OwntracksFriends: Could not reverse geocode " + payload.lat + ", " + payload.lon + ": " + e.message);
+                }
+            });
+        })
+        // If any error has occured, log error to console
+            .on('error', function (e) {
+                Log.error("OwntracksFriends: Could not reverse geocode " + payload.lat + ", " + payload.lon + ": " + e.message);
+            });
     }
 });

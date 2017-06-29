@@ -28,6 +28,10 @@ Module.register("MMM-OwntracksFriends", {
         this.loaded = false;
         console.info("OwntracksFriends initializing.");
         this.sendSocketNotification("OwntracksFriends-SETUP-MQTT", this.config);
+        var self = this;
+        window.setInterval(function () {
+            self.updateDom();
+        }, 60000);
     },
 
     getScripts: function () {
@@ -90,7 +94,7 @@ Module.register("MMM-OwntracksFriends", {
 
                 var timestampLabel = document.createElement("td");
                 timestampLabel.className = 'ot-timestamp-label dimmed small';
-                timestampLabel.innerHTML = data.when;
+                timestampLabel.innerHTML = moment.unix(data.when).fromNow();
 
                 friendWrapper.appendChild(friendLabel);
                 friendWrapper.appendChild(locationLabel);
@@ -114,12 +118,25 @@ Module.register("MMM-OwntracksFriends", {
                 location = this.translate('left') + ' ' + ot_raw_data.desc;
             }
         } else if (ot_raw_data.hasOwnProperty('_type') && ot_raw_data._type === 'location') {
-            location = this.translate('AWAY');
+            if (location_data.hasOwnProperty('reverse_geo')) {
+                var all_geo = location_data.reverse_geo.split(",");
+                if (all_geo.length > 1) {
+                    location = all_geo.splice(0, 2).join(",");
+                } else {
+                    location = location_data.reverse_geo;
+                }
+            } else {
+                location = this.translate('AWAY');
+            }
             // location = message.lat + ' ' + message.lon;
+        } else if (ot_raw_data.hasOwnProperty('_type') && ot_raw_data._type === 'lwt') {
+            location = this.trackingList[location_data.user].location
         }
 
         if (ot_raw_data.hasOwnProperty('tst')) {
-            when = moment.unix(ot_raw_data.tst).fromNow();
+            when = ot_raw_data.tst;
+        } else {
+            when = this.trackingList[location_data.user].when;
         }
 
         this.trackingList[location_data.user] = {
@@ -135,6 +152,7 @@ Module.register("MMM-OwntracksFriends", {
 
     // socketNotificationReceived from helper
     socketNotificationReceived: function (notification, payload) {
+        console.log(payload);
         if (notification === "OwntracksFriends-LOCATION-UPDATE") {
             this.updateUserLocation(payload);
         }
