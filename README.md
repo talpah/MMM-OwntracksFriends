@@ -7,7 +7,7 @@ This is a module for the [MagicMirror²](https://github.com/MichMich/MagicMirror
 To install, you need to clone this repo inside the `modules/` directory:
 ```bash
 cd modules
-git clone https://github.com/talpah/MMM-OwnTracks
+git clone https://github.com/talpah/MMM-OwntracksFriends
 ```
 Then you need to install the dependencies using `npm` inside the cloned module:
 ```bash
