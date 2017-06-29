@@ -1,8 +1,8 @@
 {
   "name": "OwntracksFriends",
   "version": "1.0.0",
-  "description": "Track Friends via Mosquitto and OwnTracks",
-  "main": "OwntracksFriends.js",
+  "description": "Show Friends/Family whereabouts via Mosquitto and OwnTracks. Inspired by hass.io",
+  "main": "MMM-OwntracksFriends.js",
   "author": "talpah@gmail.com",
   "license": "MIT",
   "dependencies": {

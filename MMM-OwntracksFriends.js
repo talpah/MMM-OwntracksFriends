@@ -7,7 +7,7 @@
  * MIT Licensed.
  */
 
-Module.register("OwntracksFriends", {
+Module.register("MMM-OwntracksFriends", {
     defaults: {
         mqtt: {
             host: "mqtt://localhost:1833/",
@@ -26,7 +26,7 @@ Module.register("OwntracksFriends", {
     start: function () {
         //Flag for check if module is loaded
         this.loaded = false;
-        // Schedule update timer.
+        console.info("OwntracksFriends initializing.");
         this.sendSocketNotification("OwntracksFriends-SETUP-MQTT", this.config);
     },
 
@@ -37,7 +37,7 @@ Module.register("OwntracksFriends", {
     },
     getStyles: function () {
         return [
-            this.file('OwntracksFriends.css')
+            this.file('MMM-OwntracksFriends.css')
         ]
     },
 
@@ -106,7 +106,6 @@ Module.register("OwntracksFriends", {
         var location = this.translate("Unknown");
         var when = this.translate("Unknown");
         var ot_raw_data = location_data.data;
-        var gravatar_photo = null;
 
         if (ot_raw_data.hasOwnProperty('_type') && ot_raw_data._type === 'transition') {
             if (ot_raw_data.event === 'enter') {
@@ -137,7 +136,6 @@ Module.register("OwntracksFriends", {
     // socketNotificationReceived from helper
     socketNotificationReceived: function (notification, payload) {
         if (notification === "OwntracksFriends-LOCATION-UPDATE") {
-            // set dataNotification
             this.updateUserLocation(payload);
         }
     }
