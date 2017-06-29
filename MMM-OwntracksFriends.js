@@ -94,7 +94,7 @@ Module.register("MMM-OwntracksFriends", {
                 locationLabel.className = 'ot-location-label bright';
 
                 var timestampLabel = document.createElement("td");
-                timestampLabel.className = 'ot-timestamp-label dimmed small';
+                timestampLabel.className = 'ot-timestamp-label dimmed thin xsmall';
                 timestampLabel.innerHTML = moment.unix(data.when).fromNow();
 
                 friendWrapper.appendChild(friendLabel);
