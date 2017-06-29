@@ -82,8 +82,9 @@ Module.register("MMM-OwntracksFriends", {
                     userp.width = 25;
                     userp.align = "center";
                     friendLabel.appendChild(userp);
+                } else {
+                    friendLabel.appendChild(document.createTextNode(data.user));
                 }
-                friendLabel.appendChild(document.createTextNode(data.user));
 
                 friendLabel.title = data.device;
                 friendLabel.className = 'ot-friend-label align-left';
