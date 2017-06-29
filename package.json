@@ -1,0 +1,28 @@
+{
+  "name": "OwntracksFriends",
+  "version": "1.0.0",
+  "description": "Todo: Insert description here!",
+  "main": "OwntracksFriends.js",
+  "author": "Cosmin",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "latest",
+    "grunt-eslint": "latest",
+    "grunt-jsonlint": "latest",
+    "grunt-markdownlint": "^1.0.13",
+    "grunt-stylelint": "latest",
+    "grunt-yamllint": "latest",
+    "stylelint-config-standard": "latest",
+    "time-grunt": "latest"
+  },
+  "dependencies": {
+    "aja": "^0.4.1",
+    "browserify": "^14.4.0",
+    "md5": "^2.2.1",
+    "moment": "latest",
+    "mqtt": "^2.9.0"
+  },
+  "scripts": {
+    "install": "browserify node_modules/md5/md5.js > md5-browser.js"
+  }
+}
