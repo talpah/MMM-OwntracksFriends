@@ -16,9 +16,6 @@
     "time-grunt": "latest"
   },
   "dependencies": {
-    "aja": "^0.4.1",
-    "browserify": "^14.4.0",
-    "md5": "^2.2.1",
     "moment": "latest",
     "mqtt": "^2.9.0"
   },
