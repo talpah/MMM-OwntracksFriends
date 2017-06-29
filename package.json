@@ -1,25 +1,12 @@
 {
   "name": "OwntracksFriends",
   "version": "1.0.0",
-  "description": "Todo: Insert description here!",
+  "description": "Track Friends via Mosquitto and OwnTracks",
   "main": "OwntracksFriends.js",
-  "author": "Cosmin",
+  "author": "talpah@gmail.com",
   "license": "MIT",
-  "devDependencies": {
-    "grunt": "latest",
-    "grunt-eslint": "latest",
-    "grunt-jsonlint": "latest",
-    "grunt-markdownlint": "^1.0.13",
-    "grunt-stylelint": "latest",
-    "grunt-yamllint": "latest",
-    "stylelint-config-standard": "latest",
-    "time-grunt": "latest"
-  },
   "dependencies": {
     "moment": "latest",
     "mqtt": "^2.9.0"
-  },
-  "scripts": {
-    "install": "browserify node_modules/md5/md5.js > md5-browser.js"
   }
 }
