@@ -94,7 +94,7 @@ Module.register("MMM-OwntracksFriends", {
                 locationLabel.className = 'ot-location-label bright';
 
                 var timestampLabel = document.createElement("td");
-                timestampLabel.className = 'ot-timestamp-label dimmed thin xsmall';
+                timestampLabel.className = 'ot-timestamp-label thin xsmall';
                 timestampLabel.innerHTML = moment.unix(data.when).fromNow();
 
                 friendWrapper.appendChild(friendLabel);
@@ -115,9 +115,10 @@ Module.register("MMM-OwntracksFriends", {
         if (ot_raw_data.hasOwnProperty('_type') && ot_raw_data._type === 'transition') {
             if (ot_raw_data.event === 'enter') {
                 location = ot_raw_data.desc;
-            } else {
-                location = this.translate('left') + ' ' + ot_raw_data.desc;
             }
+            // else {
+            //     location = this.translate('left') + ' ' + ot_raw_data.desc;
+            // }
         } else if (ot_raw_data.hasOwnProperty('_type') && ot_raw_data._type === 'location') {
             if (location_data.hasOwnProperty('reverse_geo')) {
                 var all_geo = location_data.reverse_geo.split(",");
