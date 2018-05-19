@@ -7,6 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "moment": "latest",
+    "js-md5": "latest",
     "mqtt": "^2.9.0"
   }
 }

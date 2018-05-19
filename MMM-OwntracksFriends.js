@@ -32,11 +32,26 @@ Module.register("MMM-OwntracksFriends", {
         window.setInterval(function () {
             self.updateDom();
         }, 60000);
+        for (var friend in this.config.known_friends) {
+            this.trackingList[friend] = {
+                user: friend,
+                user_photo: this.getGravatarPhoto(this.config.known_friends[friend]),
+                device: 'n/a',
+                location: 'waiting...',
+                when: moment().unix()
+            }
+        }
+    },
+
+    getGravatarPhoto: function (email) {
+        var email_hash = md5.create().update(email).hex();
+        return "//www.gravatar.com/avatar/" + email_hash;
     },
 
     getScripts: function () {
         return [
-            "moment.js"
+            "moment.js",
+            this.file("node_modules/js-md5/src/md5.js"),
         ]
     },
     getStyles: function () {
@@ -57,12 +72,6 @@ Module.register("MMM-OwntracksFriends", {
         // create element wrapper for show into the module
         var friendsListWrapper = document.createElement("table");
         friendsListWrapper.className = 'ot-main-list small';
-
-        if (!this.loaded) {
-            friendsListWrapper.innerHTML = this.translate("LOADING");
-            friendsListWrapper.className = "dimmed light small";
-            return friendsListWrapper;
-        }
 
         // If this.trackingList is not empty
         if (this.trackingList) {

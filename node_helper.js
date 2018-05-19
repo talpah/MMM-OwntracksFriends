@@ -8,7 +8,8 @@
 var NodeHelper = require("node_helper");
 var mqtt = require('mqtt');
 var moment = require('moment');
-var http = require('http');
+var http = require('https');
+var crypto = require('crypto');
 
 module.exports = NodeHelper.create({
 
@@ -87,7 +88,6 @@ module.exports = NodeHelper.create({
         var gravatar_photo = null;
 
         if (this.config.known_friends.hasOwnProperty(user)) {
-            var crypto = require('crypto');
             var email_hash = crypto.createHash('md5').update(this.config.known_friends[user]).digest('hex');
             gravatar_photo = "//www.gravatar.com/avatar/" + email_hash;
         }
@@ -124,13 +124,13 @@ module.exports = NodeHelper.create({
                     prepared_payload.reverse_geo = parsed.display_name;
                     callback(self, topic, prepared_payload);
                 } catch (e) {
-                    Log.error("OwntracksFriends: Could not reverse geocode " + payload.lat + ", " + payload.lon + ": " + e.message);
+                    console.error("OwntracksFriends: Could not reverse geocode " + payload.lat + ", " + payload.lon + ": " + e.message);
                 }
             });
         })
         // If any error has occured, log error to console
             .on('error', function (e) {
-                Log.error("OwntracksFriends: Could not reverse geocode " + payload.lat + ", " + payload.lon + ": " + e.message);
+                console.error("OwntracksFriends: Could not reverse geocode " + payload.lat + ", " + payload.lon + ": " + e.message);
             });
     }
 });
